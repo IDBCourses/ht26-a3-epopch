@@ -26,7 +26,8 @@ import { createShape } from "./shape.js";
 // ---------- Settings ----------
 // Settings variables should contain all of the "fixed" parts of your programs
 // For example: which notes you can play, how fast things move, the tempo.
-const note = "C4"; // the note played when the pointer goes down
+// const note = "C4"; // the note played when the pointer goes down
+// const shape
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
@@ -50,11 +51,21 @@ function use() {
 
 // ---------- Controls (Event Handlers) ----------
 // Runs every time the pointer goes down: a click, a tap or a pen touch.
-function pointerDown(event) {
+function startSound(event) {
   Tone.start(); // browsers only allow sound after the player has pressed something
 
-  console.log("Pointer down at", event.clientX, event.clientY);
-  synth.triggerAttackRelease(note, "8n"); // play the note for an eighth note
+  /*console.log("Pointer down at", event.clientX, event.clientY);
+  synth.triggerAttackRelease(note, "8n"); // play the note for an eighth note */
+}
+
+function pointerEnter(event) {
+  synth.triggerAttackRelease("C4", "8n");
+  shape.setColour(200, 80, 50);
+}
+
+function pointerLeave(event) {
+  synth.triggerAttackRelease("G3", "8n");
+  shape.setColour(120, 80, 50);
 }
 
 // ---------- Setup ----------
@@ -64,11 +75,17 @@ function setup() {
   use(); // start the use loop
 
   // Example: a shape near the middle of the window. Replace it with your own.
-  const example = createShape("example");
-  example.setPosition(0.5, 0.5);
+  const shape = createShape("shape");
+  shape.setPosition(0.3, 0.3);
+  shape.setColour(120, 80, 50);
+  shape.setRoundness(0.3); //doesn't seem to work
+  shape.setSize(300); // doesn't seem to work?
 
   // Put your event listener code here
-  window.addEventListener("pointerdown", pointerDown);
+  window.addEventListener("pointerdown", startSound);
+
+  shape.element.addEventListener("pointerEnter", pointerEnter);
+  shape.element.addEventListener("pointerleave", pointerLeave);
 }
 
 setup(); // Always remember to call setup()!
