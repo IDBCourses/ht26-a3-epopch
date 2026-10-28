@@ -32,6 +32,7 @@ import { createShape } from "./shape.js";
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: where the pointer is, how fast it's moving, or whether a drone is on.
+const shape = createShape("shape");
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -59,12 +60,13 @@ function startSound(event) {
 }
 
 function pointerEnter(event) {
-  synth.triggerAttackRelease("C4", "8n");
+  synth.triggerAttack("C4");
   shape.setColour(200, 80, 50);
+  synth.volume.value = -12; // use this to change the volume of the sound, can be tied to changing value
 }
 
 function pointerLeave(event) {
-  synth.triggerAttackRelease("G3", "8n");
+  synth.triggerRelease("C4");
   shape.setColour(120, 80, 50);
 }
 
@@ -75,16 +77,15 @@ function setup() {
   use(); // start the use loop
 
   // Example: a shape near the middle of the window. Replace it with your own.
-  const shape = createShape("shape");
   shape.setPosition(0.3, 0.3);
   shape.setColour(120, 80, 50);
-  shape.setRoundness(0.3); //doesn't seem to work
+  shape.setRoundedness(0.3); // I initially spelled roundedness wrong lol
   shape.setSize(300); // doesn't seem to work?
 
   // Put your event listener code here
   window.addEventListener("pointerdown", startSound);
 
-  shape.element.addEventListener("pointerEnter", pointerEnter);
+  shape.element.addEventListener("pointerenter", pointerEnter); // spelled pointerenter wrong, now fixed
   shape.element.addEventListener("pointerleave", pointerLeave);
 }
 

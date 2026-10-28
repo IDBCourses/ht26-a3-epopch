@@ -23,6 +23,7 @@ body {
   padding: 0;
   line-height: 1.5;
   font-family: system-ui, sans-serif;
+  background-color: hsl(232, 5%, 30%);
 }
 
 kbd {
