@@ -3,12 +3,23 @@
 .shape {
   width: 100px;
   height: 100px;
-  background-color: deeppink;
+  background-color: hsl(230, 25%, 95%);
   /* Positioned from the top-left of the window; setPosition() moves it from there. */
   position: absolute;
   top: 0;
   left: 0;
   border-radius: 50%;
+}
+
+#ghost {
+    background: hsl(0, 0%, 100%);
+  width:100px;
+  height:150px;
+  -webkit-border-radius: 8px; /* this gets a problem ping, but seems to work nevertheless hence why it's still here. plus, the ghost element becomes and oval without this. */
+  -webkit-top-right-border-radius:50%;
+  -webkit-top-left-border-radius:50%;
+  border-top-right-radius:50%;
+  border-top-left-radius:50%;
 }
 
 /* Prevent padding and border from affecting element width. */
@@ -23,7 +34,7 @@ body {
   padding: 0;
   line-height: 1.5;
   font-family: system-ui, sans-serif;
-  background-color: hsl(232, 5%, 30%);
+  background-color: hsl(244, 17%, 33%);
 }
 
 kbd {
