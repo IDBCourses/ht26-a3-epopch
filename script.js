@@ -40,17 +40,19 @@ const shape = createShape("shape"); // test
 const ghost = createShape("ghost"); // ghost
 // new stuff below
 const isPlaying = false;
+let inGhost = false;
 const pastX = 0;
 const pastY = 0;
+const lastTime = 0;
 const speed = 0;
 const distance = 0;
 const ghostEnergy = 0;
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
-const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once // I want to change this, but don't want to ruin the code
+//const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once // I want to change this, but don't want to ruin the code
 //new stuff below, filter and reverb work on synth, i'll have to test ghostSynth
-const ghostSynth = new Tone.Synth({
+const synth = new Tone.Synth({
   oscillator: {
     type: "sine"
   },
@@ -69,7 +71,7 @@ const filter = new Tone.Filter(
   1200,
   "lowpass"
 );
-ghostSynth.connect(filter);
+synth.connect(filter);
 filter.connect(reverb);
 reverb.toDestination();
 
@@ -88,7 +90,7 @@ function update() {
 function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
   // new stuff below
-  const reveal = Math.min(
+  /*const reveal = Math.min(
     1,
     ghostEnergy / maxGhostEnergy
   );
@@ -99,7 +101,7 @@ function use() {
   ghost.element.style.opacity = 0.15 + reveal * 0.85;
   if (ghost.element.style.transform) {
     ghost.element.style.transform = `scale(${size / 120})`;
-  }
+  } */
 }
 
 // ---------- Controls (Event Handlers) ----------
@@ -110,65 +112,45 @@ function startSound(event) {
   console.log("Pointer down at", event.clientX, event.clientY);
 }
 
+function pointerEnter(event) {
+  synth.triggerAttackRelease("C4", "8n");
+  shape.setColour(200, 10, 80);
+  synth.volume.value = +12; // use this to change the volume of the sound, can be tied to changing value
+}
+
+function pointerLeave(event) {
+  console.log("pointer left"); // here for testing
+  synth.triggerAttackRelease("C4", "12n");
+  shape.setColour(120, 80, 50);
+  synth.volume.value = -12;
+}
+
+function ghostEnter(event) {
+  inGhost = true;
+  synth.triggerAttackRelease("C4", "8n");
+  synth.volume.value = +12;
+  ghost.setColour(120, 80, 50);
+}
+
+function ghostLeave(event) {
+  console.log("ghost left"); // also here for testing
+  inGhost = false;
+  synth.volume.value = -12;
+  synth.triggerAttackRelease("G4", "12n");
+  ghost.setColour(0, 0, 100);
+}
+
 function pointerMove(event) { // this works but the shape isnt centred on pointer right now
   const lastX = event.clientX / window.innerWidth;
   const lastY = event.clientY / window.innerHeight;
 
-  // shape.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+  // ghost.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+  if (inGhost = true) {
+    ghost.setPosition(lastX, lastY);
+  }
 }
 
-function pointerEnter(event) {
-  synth.triggerAttack("C4");
-  shape.setColour(200, 10, 80);
-  synth.volume.value = -12; // use this to change the volume of the sound, can be tied to changing value
-}
 
-function pointerLeave(event) {
-  synth.triggerRelease("C4");
-  shape.setColour(120, 80, 50);
-}
-
-// new below
-function sing(x, y) {
-  const rect = ghost.getBoundingClientRect();
-  const horizontalPosition = Math.max(
-    0,
-    Math.min(
-      0.999,
-      (x - rect.left) / rect.width
-    )
-  );
-
-  const noteIndex = Math.floor(
-    horizontalPosition * noteS.length
-  );
-  const note = noteS[noteIndex];
-
-  const verticalPosition = Math.max(
-    0,
-    Math.min(
-      1,
-      (y - rect.top) / rect.height
-    )
-  );
-
-  filter.frequency.value = 300 + (1 - verticalPosition) * 4700;
-
-  const velocity = Math.max(
-    0.2,
-    Math.min(
-      1,
-      0.3 + speed / 25
-    )
-  );
-
-  ghostSynth.triggerAttackRelease(
-    note,
-    noteLength,
-    velocity
-  );
-  ghostEnergy++;
-}
 
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
@@ -176,11 +158,10 @@ function setup() {
   update(); // start the update loop
   use(); // start the use loop
 
-  // Example: a shape near the middle of the window. Replace it with your own.
   shape.setPosition(0.3, 0.3);
   shape.setColour(120, 80, 50);
-  shape.setRoundedness(0.1); // I initially spelled roundedness wrong lol
-  shape.setSize(100); // doesn't seem to work?
+  shape.setRoundedness(0.1);
+  shape.setSize(100);
 
   ghost.setPosition(0.5, 0.5);
 
@@ -190,8 +171,14 @@ function setup() {
 
   shape.element.addEventListener("pointerenter", pointerEnter);
   shape.element.addEventListener("pointerleave", pointerLeave);
+
   // new stuff below
-  ghost.element.addEventListener("pointercancel", stopPlaying);
+  ghost.element.addEventListener("pointerenter", ghostEnter);
+  ghost.element.addEventListener("pointerleave", ghostLeave);
+  /*ghost.element.addEventListener("pointerdown", ghostpointDown);
+  ghost.element.addEventListener("pointermove", ghostpointMove);
+  ghost.element.addEventListener("pointerup", ghostpointUp);*/
+  // ghost.element.addEventListener("pointercancel", stopPlaying);
 
 }
 
