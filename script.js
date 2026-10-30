@@ -29,6 +29,7 @@ import { createShape } from "./shape.js";
 // const note = "C4"; // the note played when the pointer goes down
 const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // pentathonic scale
 // new stuff below
+// const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
 const noteLength = "8n"; // fairly certain this doesn't actually work
 const movementThreshold = 20;
 const maxGhostEnergy = 50;
@@ -39,14 +40,16 @@ const maxGhostEnergy = 50;
 const shape = createShape("shape"); // test
 const ghost = createShape("ghost"); // ghost
 // new stuff below
+const pointerX = 0; // stores the pointers position
+const pointerY = 0;
+
+const ghostX = 0.5;
+const ghostY = 0.5;
+
 const isPlaying = false;
-let inGhost = false;
+let ghostNoteIndex = 0;
 const pastX = 0;
 const pastY = 0;
-const lastTime = 0;
-const speed = 0;
-const distance = 0;
-const ghostEnergy = 0;
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -54,26 +57,46 @@ const ghostEnergy = 0;
 //new stuff below, filter and reverb work on synth, i'll have to test ghostSynth
 const synth = new Tone.Synth({
   oscillator: {
-    type: "sine"
+    type: "triangle8"
   },
 
   envelope: {
-    attack: 0.05,
+    attack: 0.3,
     decay: 0.2,
-    sustain: 0.4
+    sustain: 0.5,
+    release: 0.8
   }
 });
+
 const reverb = new Tone.Reverb({
   decay: 5,
   wet: 0.5
 });
+
 const filter = new Tone.Filter(
   1200,
   "lowpass"
 );
-synth.connect(filter);
+
+const vibrato = new Tone.Vibrato({ // adds a more wobbly feel to the sound
+  frequency: 5,
+  depth: 0.35
+});
+
+synth.connect(vibrato);
+vibrato.connect(filter);
 filter.connect(reverb);
 reverb.toDestination();
+
+// ghost drone below
+const ghostDrone = new Tone.Oscillator({
+  frequency: 220,
+  type: "triangle"
+});
+const ghostGain = new Tone.Gain(0);
+ghostDrone.connect(ghostGain);
+ghostGain.connect(reverb);
+ghostDrone.start();
 
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
@@ -90,18 +113,25 @@ function update() {
 function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
   // new stuff below
-  /*const reveal = Math.min(
-    1,
-    ghostEnergy / maxGhostEnergy
+  const dx = pointerX - ghostX;
+  const dy = pointerY - ghostY;
+  const distance = Math.sqrt(
+    dx * dx + dy * dy
   );
-  const size = 120 + Math.min(
-    40,
-    speed * 4
+
+  const intensity = Math.max(
+    0, 1 - distance * 1.5
   );
-  ghost.element.style.opacity = 0.15 + reveal * 0.85;
-  if (ghost.element.style.transform) {
-    ghost.element.style.transform = `scale(${size / 120})`;
-  } */
+
+  ghostGain.gain.rampTo(
+    intensity * 0.2,
+    0.1
+  );
+
+  filter.frequency.rampTo(
+    500 + intensity * 400,
+    0.1
+  );
 }
 
 // ---------- Controls (Event Handlers) ----------
@@ -113,44 +143,51 @@ function startSound(event) {
 }
 
 function pointerEnter(event) {
-  synth.triggerAttackRelease("C4", "8n");
+  synth.triggerAttack("C4");
   shape.setColour(200, 10, 80);
-  synth.volume.value = +12; // use this to change the volume of the sound, can be tied to changing value
+  //synth.volume.value = +12; // use this to change the volume of the sound, can be tied to changing value
 }
 
 function pointerLeave(event) {
   console.log("pointer left"); // here for testing
-  synth.triggerAttackRelease("C4", "12n");
+  synth.triggerRelease();
   shape.setColour(120, 80, 50);
-  synth.volume.value = -12;
+  //synth.volume.value = -12;
 }
 
-function ghostEnter(event) {
-  synth.triggerAttackRelease("C4", "8n");
-  synth.volume.value = +12;
+function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
+  const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
+  //synth.volume.value = +12;
+  synth.triggerAttackRelease(randomNote, "12n");
+
   ghost.setColour(120, 80, 50);
-  teleportGhost();
+
+  setTimeout(() => { // delays the teleportation briefly so that there's enough time for the note to get played!
+    teleportGhost();
+  }, 500);
 }
 
 function ghostLeave(event) {
   console.log("ghost left"); // also here for testing
   synth.volume.value = -12;
-  synth.triggerAttackRelease("G4", "12n");
+  synth.triggerAttackRelease("G4", "16n");
+  //synth.triggerAttackRelease(randomNote, "12n");
   ghost.setColour(0, 0, 100);
 }
 
 function pointerMove(event) { // this works but the shape isnt centred on pointer right now
-  const lastX = event.clientX / window.innerWidth;
-  const lastY = event.clientY / window.innerHeight;
-
-  // ghost.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+  //const lastX = event.clientX / window.innerWidth;
+  //const lastY = event.clientY / window.innerHeight;
+  // shape.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+  const pointerX = event.clientX / window.innerWidth;
+  const pointerY = event.clientY / window.innerHeight;
 }
 
 function teleportGhost() {
-  const randomX = Math.random() * 0.8 + 0.1;
-  const randomY = Math.random() * 0.8 + 0.1;
+  const ghostX = Math.random() * 0.8 + 0.1;
+  const ghostY = Math.random() * 0.8 + 0.1;
 
-  ghost.setPosition(randomX, randomY);
+  ghost.setPosition(ghostX, ghostY);
 }
 
 // ---------- Setup ----------
@@ -164,8 +201,7 @@ function setup() {
   shape.setRoundedness(0.1);
   shape.setSize(100);
 
-  // ghost.setPosition(0.5, 0.5); // remove?
-  teleportGhost();
+  teleportGhost(); // spawns the ghost in a random location when setup is called at the start of the program
 
   // Put your event listener code here
   window.addEventListener("pointerdown", startSound);
