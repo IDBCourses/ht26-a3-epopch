@@ -126,15 +126,14 @@ function pointerLeave(event) {
 }
 
 function ghostEnter(event) {
-  inGhost = true;
   synth.triggerAttackRelease("C4", "8n");
   synth.volume.value = +12;
   ghost.setColour(120, 80, 50);
+  teleportGhost();
 }
 
 function ghostLeave(event) {
   console.log("ghost left"); // also here for testing
-  inGhost = false;
   synth.volume.value = -12;
   synth.triggerAttackRelease("G4", "12n");
   ghost.setColour(0, 0, 100);
@@ -145,12 +144,14 @@ function pointerMove(event) { // this works but the shape isnt centred on pointe
   const lastY = event.clientY / window.innerHeight;
 
   // ghost.setPosition(lastX, lastY); // add back later, makes shape follow pointer
-  if (inGhost = true) {
-    ghost.setPosition(lastX, lastY);
-  }
 }
 
+function teleportGhost() {
+  const randomX = Math.random() * 0.8 + 0.1;
+  const randomY = Math.random() * 0.8 + 0.1;
 
+  ghost.setPosition(randomX, randomY);
+}
 
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
@@ -163,7 +164,8 @@ function setup() {
   shape.setRoundedness(0.1);
   shape.setSize(100);
 
-  ghost.setPosition(0.5, 0.5);
+  // ghost.setPosition(0.5, 0.5); // remove?
+  teleportGhost();
 
   // Put your event listener code here
   window.addEventListener("pointerdown", startSound);
