@@ -12,7 +12,7 @@
 }
 
 #ghost {
-    background: hsl(0, 0%, 100%);
+  background: hsl(0, 0%, 100%);
   width:100px;
   height:150px;
   -webkit-border-radius: 8px; /* this gets a problem ping, but seems to work nevertheless hence why it's still here. plus, the ghost element becomes and oval without this. */
@@ -20,6 +20,10 @@
   -webkit-top-left-border-radius:50%;
   border-top-right-radius:50%;
   border-top-left-radius:50%;
+}
+
+#flashlight {
+  background-color: yellow; /* color here is more or less a placeholder to ensure that flashlight exists as an element */
 }
 
 /* Prevent padding and border from affecting element width. */
@@ -34,7 +38,7 @@ body {
   padding: 0;
   line-height: 1.5;
   font-family: system-ui, sans-serif;
-  background-color: hsl(244, 17%, 33%);
+  background-color: hsl(244, 36%, 17%);
 }
 
 kbd {

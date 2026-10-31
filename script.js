@@ -39,6 +39,7 @@ const maxGhostEnergy = 50;
 // For example: where the pointer is, how fast it's moving, or whether a drone is on.
 const shape = createShape("shape"); // test
 const ghost = createShape("ghost"); // ghost
+const flashlight = createShape("flashlight"); // flash light
 
 // new stuff below
 let pointerX = 0; // stores the pointers position
@@ -134,6 +135,8 @@ function use() {
     500 + intensity * 400,
     0.1
   );
+
+  ghost.element.style.opacity = 0.02 + intensity * 0.98;
 }
 
 // ---------- Controls (Event Handlers) ----------
@@ -158,15 +161,32 @@ function pointerLeave(event) {
 }
 
 function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
-  const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
+  /*const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
   //synth.volume.value = +12;
-  synth.triggerAttackRelease(randomNote, "12n");
+  synth.triggerAttackRelease(randomNote, "12n"); */ // random note
+
+  // testing new thing below, this plays a small melody when ghost is touched
+  /*noteS.forEach((note, index) => {
+    setTimeout(() => {
+      synth.triggerAttackRelease(note, "32n");
+    }, index * 50);
+  }); */
+
+  // another test below, splendid it works. makes the jingle different everytime the ghost is touched
+  const randomStart = Math.floor(Math.random() * noteS.length);
+  noteS.forEach((_, index) => {
+    const noteGhost = noteS[(randomStart + index) % noteS.length];
+    setTimeout(() => {
+      synth.triggerAttackRelease(noteGhost, "32n");
+    }, index * 50);
+  });
 
   ghost.setColour(0, 1, 50); // fix color later
+  ghost.element.style.boxShadow = "0 0 50px hsl(200, 84%, 71%)";
 
   setTimeout(() => { // delays the teleportation briefly so that there's enough time for the note to get played!
     teleportGhost();
-  }, 500);
+  }, 1000);
 }
 
 function ghostLeave(event) {
@@ -178,9 +198,9 @@ function ghostLeave(event) {
 }
 
 function pointerMove(event) { // this works but the shape isnt centred on pointer right now
-  //const lastX = event.clientX / window.innerWidth;
-  //const lastY = event.clientY / window.innerHeight;
-  // shape.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+  const lastX = event.clientX / window.innerWidth;
+  const lastY = event.clientY / window.innerHeight;
+  flashlight.setPosition(lastX, lastY); // add back later, makes shape follow pointer
   pointerX = event.clientX / window.innerWidth;
   pointerY = event.clientY / window.innerHeight;
 
@@ -217,6 +237,12 @@ function setup() {
   shape.setRoundedness(0.1);
   shape.setSize(100);
 
+  flashlight.setRoundedness(1);
+  flashlight.setSize(100);
+  flashlight.setColour(70, 80, 100, 0.5);
+  flashlight.setPosition(0.5, 0.5);
+  flashlight.element.style.boxShadow = "0 0 50px hsl(69, 87%, 79%)";
+
   teleportGhost(); // spawns the ghost in a random location when setup is called at the start of the program
 
   // Put your event listener code here
@@ -229,11 +255,6 @@ function setup() {
   // new stuff below
   ghost.element.addEventListener("pointerenter", ghostEnter);
   ghost.element.addEventListener("pointerleave", ghostLeave);
-  /*ghost.element.addEventListener("pointerdown", ghostpointDown);
-  ghost.element.addEventListener("pointermove", ghostpointMove);
-  ghost.element.addEventListener("pointerup", ghostpointUp);*/
-  // ghost.element.addEventListener("pointercancel", stopPlaying);
-
 }
 
 setup(); // ring ring calling doctor setup();
