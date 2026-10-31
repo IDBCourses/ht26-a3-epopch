@@ -48,6 +48,11 @@ let pointerY = 0;
 let ghostX = 0.5;
 let ghostY = 0.5;
 
+// trying NEW STUFF
+const trail = [];
+const trailLength = 5;
+const pointerHistory = [];
+
 const isPlaying = false;
 let ghostNoteIndex = 0;
 let pastX = 0;
@@ -94,7 +99,7 @@ reverb.toDestination();
 // ghost drone below
 const ghostDrone = new Tone.Oscillator({
   frequency: 220,
-  type: "triangle"
+  type: "sine"
 });
 const ghostGain = new Tone.Gain(0);
 ghostDrone.connect(ghostGain);
@@ -104,7 +109,7 @@ ghostDrone.start();
 // ---------- Update ----------
 // Update the state. This is called every 100ms.
 function update() {
-  setTimeout(update, 100); // call update() again in 100 milliseconds
+  setTimeout(update, 10); // call update() again in 100 milliseconds
   // new stuff below
   ghost.setSize(
     80 + Math.sin(Date.now() * 0.002) * 10
@@ -121,10 +126,10 @@ function use() {
   const distance = Math.sqrt(
     ghostDX * ghostDX + ghostDY * ghostDY
   );
-
   const intensity = Math.max(
     0, 1 - distance * 1.5
   );
+  const glowSize = 20 + pointerSpeed * 300;
 
   ghostGain.gain.rampTo(
     intensity * 0.2,
@@ -137,6 +142,17 @@ function use() {
   );
 
   ghost.element.style.opacity = 0.02 + intensity * 0.98;
+  flashlight.element.style.boxShadow = `0 0 ${glowSize}px 20px hsl(69, 87%, 79%)`; //idk if this does anything
+
+  trail.forEach((dot, index) => {
+    if (pointerHistory[index]) {
+      dot.setPosition(pointerHistory[index].x,
+        pointerHistory[index].y
+      );
+      dot.setSize(10 + index * 10);
+      dot.element.style.opacity = (index + 1) / trailLength;
+    }
+  });
 }
 
 // ---------- Controls (Event Handlers) ----------
@@ -182,7 +198,7 @@ function ghostEnter(event) { // when ghost gets touched by the pointer it'll tel
   });
 
   ghost.setColour(0, 1, 50); // fix color later
-  ghost.element.style.boxShadow = "0 0 50px hsl(200, 84%, 71%)";
+  ghost.element.style.boxShadow = "0 0 50px hsl(192, 84%, 71%)"; // adds box shadow when ghost is found
 
   setTimeout(() => { // delays the teleportation briefly so that there's enough time for the note to get played!
     teleportGhost();
@@ -195,18 +211,20 @@ function ghostLeave(event) {
   synth.triggerAttackRelease("G4", "16n");
   //synth.triggerAttackRelease(randomNote, "12n");
   ghost.setColour(0, 0, 100);
+  ghost.element.style.boxShadow = ""; // removes box shadow
 }
 
 function pointerMove(event) { // this works but the shape isnt centred on pointer right now
   const lastX = event.clientX / window.innerWidth;
   const lastY = event.clientY / window.innerHeight;
   flashlight.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+
   pointerX = event.clientX / window.innerWidth;
   pointerY = event.clientY / window.innerHeight;
 
   // new stuff below, unsure if I want to keep this, check again later
   const moveDX = pointerX - pastX;
-  const moveDY = pointerX - pastY;
+  const moveDY = pointerY - pastY;
 
   pointerSpeed = Math.sqrt(moveDX * moveDX + moveDY * moveDY);
 
@@ -217,6 +235,15 @@ function pointerMove(event) { // this works but the shape isnt centred on pointe
     220 + pointerSpeed * 300,
     0.1
   );
+
+  // NEW STUFF
+  pointerHistory.push({
+    x: pointerX,
+    y: pointerY
+  });
+  if (pointerHistory.length > trailLength) {
+    pointerHistory.shift();
+  }
 }
 
 function teleportGhost() {
@@ -238,21 +265,28 @@ function setup() {
   shape.setSize(100);
 
   flashlight.setRoundedness(1);
-  flashlight.setSize(100);
-  flashlight.setColour(70, 80, 100, 0.5);
-  flashlight.setPosition(0.5, 0.5);
-  flashlight.element.style.boxShadow = "0 0 50px hsl(69, 87%, 79%)";
+  flashlight.setSize(50);
+  flashlight.setColour(70, 90, 80);
+  flashlight.setPosition(0, 0);
+  flashlight.element.style.boxShadow = "0 0 100px 20px hsl(69, 87%, 79%)";
+
+  for (let i = 0; i < trailLength; i++) {
+    const dot = createShape("trail");
+    dot.setRoundedness(1);
+    dot.setColour("white");
+    dot.setSize(30);
+    trail.push(dot);
+  }
 
   teleportGhost(); // spawns the ghost in a random location when setup is called at the start of the program
 
-  // Put your event listener code here
+  // Event listeners below
   window.addEventListener("pointerdown", startSound);
   window.addEventListener("pointermove", pointerMove);
 
   shape.element.addEventListener("pointerenter", pointerEnter);
   shape.element.addEventListener("pointerleave", pointerLeave);
 
-  // new stuff below
   ghost.element.addEventListener("pointerenter", ghostEnter);
   ghost.element.addEventListener("pointerleave", ghostLeave);
 }
