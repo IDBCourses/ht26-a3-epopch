@@ -39,17 +39,19 @@ const maxGhostEnergy = 50;
 // For example: where the pointer is, how fast it's moving, or whether a drone is on.
 const shape = createShape("shape"); // test
 const ghost = createShape("ghost"); // ghost
-// new stuff below
-const pointerX = 0; // stores the pointers position
-const pointerY = 0;
 
-const ghostX = 0.5;
-const ghostY = 0.5;
+// new stuff below
+let pointerX = 0; // stores the pointers position
+let pointerY = 0;
+
+let ghostX = 0.5;
+let ghostY = 0.5;
 
 const isPlaying = false;
 let ghostNoteIndex = 0;
-const pastX = 0;
-const pastY = 0;
+let pastX = 0;
+let pastY = 0;
+let pointerSpeed = 0;
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -103,9 +105,9 @@ ghostDrone.start();
 function update() {
   setTimeout(update, 100); // call update() again in 100 milliseconds
   // new stuff below
-  if (!isPlaying) { // unsure what this really does right now but trust the process
-    return;
-  }
+  ghost.setSize(
+    80 + Math.sin(Date.now() * 0.002) * 10
+  );
 }
 
 // ---------- Use ----------
@@ -113,10 +115,10 @@ function update() {
 function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
   // new stuff below
-  const dx = pointerX - ghostX;
-  const dy = pointerY - ghostY;
+  const ghostDX = pointerX - ghostX;
+  const ghostDY = pointerY - ghostY;
   const distance = Math.sqrt(
-    dx * dx + dy * dy
+    ghostDX * ghostDX + ghostDY * ghostDY
   );
 
   const intensity = Math.max(
@@ -160,7 +162,7 @@ function ghostEnter(event) { // when ghost gets touched by the pointer it'll tel
   //synth.volume.value = +12;
   synth.triggerAttackRelease(randomNote, "12n");
 
-  ghost.setColour(120, 80, 50);
+  ghost.setColour(0, 1, 50); // fix color later
 
   setTimeout(() => { // delays the teleportation briefly so that there's enough time for the note to get played!
     teleportGhost();
@@ -179,13 +181,27 @@ function pointerMove(event) { // this works but the shape isnt centred on pointe
   //const lastX = event.clientX / window.innerWidth;
   //const lastY = event.clientY / window.innerHeight;
   // shape.setPosition(lastX, lastY); // add back later, makes shape follow pointer
-  const pointerX = event.clientX / window.innerWidth;
-  const pointerY = event.clientY / window.innerHeight;
+  pointerX = event.clientX / window.innerWidth;
+  pointerY = event.clientY / window.innerHeight;
+
+  // new stuff below, unsure if I want to keep this, check again later
+  const moveDX = pointerX - pastX;
+  const moveDY = pointerX - pastY;
+
+  pointerSpeed = Math.sqrt(moveDX * moveDX + moveDY * moveDY);
+
+  pastX = pointerX;
+  pastY = pointerY;
+
+  ghostDrone.frequency.rampTo(
+    220 + pointerSpeed * 300,
+    0.1
+  );
 }
 
 function teleportGhost() {
-  const ghostX = Math.random() * 0.8 + 0.1;
-  const ghostY = Math.random() * 0.8 + 0.1;
+  ghostX = Math.random() * 0.8 + 0.1;
+  ghostY = Math.random() * 0.8 + 0.1;
 
   ghost.setPosition(ghostX, ghostY);
 }
