@@ -31,8 +31,6 @@ const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // pentathonic scale
 // new stuff below
 // const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
 const noteLength = "8n"; // fairly certain this doesn't actually work
-const movementThreshold = 20;
-const maxGhostEnergy = 50;
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
@@ -48,12 +46,10 @@ let pointerY = 0;
 let ghostX = 0.5;
 let ghostY = 0.5;
 
-// trying NEW STUFF
 const trail = [];
 const trailLength = 5;
 const pointerHistory = [];
 
-const isPlaying = false;
 let ghostNoteIndex = 0;
 let pastX = 0;
 let pastY = 0;
@@ -177,17 +173,6 @@ function pointerLeave(event) {
 }
 
 function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
-  /*const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
-  //synth.volume.value = +12;
-  synth.triggerAttackRelease(randomNote, "12n"); */ // random note
-
-  // testing new thing below, this plays a small melody when ghost is touched
-  /*noteS.forEach((note, index) => {
-    setTimeout(() => {
-      synth.triggerAttackRelease(note, "32n");
-    }, index * 50);
-  }); */
-
   // another test below, splendid it works. makes the jingle different everytime the ghost is touched
   const randomStart = Math.floor(Math.random() * noteS.length);
   noteS.forEach((_, index) => {
