@@ -26,7 +26,7 @@ import { createShape } from "./shape.js";
 // ---------- Settings ----------
 // Settings variables should contain all of the "fixed" parts of your programs
 // For example: which notes you can play, how fast things move, the tempo.
-const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // uses an ARRAY to store the notes used in the ghost melody
+const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // uses an array to store the notes used in the ghost melody
 const ghost = createShape("ghost"); // ghost, creates the hidden target players search for
 const flashlight = createShape("flashlight"); // flashlight, visual representation of players' cursor
 
@@ -41,7 +41,7 @@ let ghostX = 0.5;
 let ghostY = 0.5;
 
 const trail = []; // initial array for shapes used to draw the visual tray behind the flashlight/pointer
-const trailLength = 5; // CONSTANT VALUE for maximum number of previous pointer positions stored for the trail
+const trailLength = 5; // constant for maximum number of previous pointer positions stored for the trail
 const pointerHistory = []; // array storing a history of pointer positions so interaction is based on MOVEMENT OVER TIME rather than a single pointer position.
 
 // previous pointer position used to calculate the movement speed
