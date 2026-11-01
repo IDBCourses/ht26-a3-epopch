@@ -249,7 +249,7 @@ function setup() {
 
   teleportGhost(); // spawns the ghost in a random location when setup is called at the start of the program
 
-  // POINTER EVENTS provide the main form of interaction (eventListeners)
+  // pointer provide the main form of interaction (eventListeners)
   window.addEventListener("pointerdown", startSound);
   window.addEventListener("pointermove", pointerMove);
 
