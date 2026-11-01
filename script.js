@@ -159,19 +159,6 @@ function startSound(event) {
   console.log("Pointer down at", event.clientX, event.clientY);
 }
 
-/*function pointerEnter(event) {
-  synth.triggerAttack("C4");
-  shape.setColour(200, 10, 80);
-  //synth.volume.value = +12; // use this to change the volume of the sound, can be tied to changing value
-}
-
-function pointerLeave(event) {
-  console.log("pointer left"); // here for testing
-  synth.triggerRelease();
-  shape.setColour(120, 80, 50);
-  //synth.volume.value = -12;
-} */
-
 function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
   // another test below, splendid it works. makes the jingle different everytime the ghost is touched
   const randomStart = Math.floor(Math.random() * noteS.length);
@@ -244,11 +231,6 @@ function setup() {
   update(); // start the update loop
   use(); // start the use loop
 
-  /*shape.setPosition(0.3, 0.3);
-  shape.setColour(120, 80, 50);
-  shape.setRoundedness(0.1);
-  shape.setSize(100); */
-
   flashlight.setRoundedness(1);
   flashlight.setSize(50);
   flashlight.setColour(70, 90, 80);
@@ -268,9 +250,6 @@ function setup() {
   // Event listeners below
   window.addEventListener("pointerdown", startSound);
   window.addEventListener("pointermove", pointerMove);
-
-  /*shape.element.addEventListener("pointerenter", pointerEnter);
-  shape.element.addEventListener("pointerleave", pointerLeave); */
 
   ghost.element.addEventListener("pointerenter", ghostEnter);
   ghost.element.addEventListener("pointerleave", ghostLeave);

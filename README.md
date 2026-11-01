@@ -1,19 +1,20 @@
 # My instrument
 
-**Play it here:** <!-- Paste your GitHub Pages link here, e.g. https://idbcourses.github.io/your-repo-name/ -->
+**Play it here:** <!-- https://github.com/IDBCourses/ht26-a3-epopch -->
 
-**Name:** <!-- Your name and MAU ID -->
+**Name:** <!-- Elsa Lindblom (ap6579) -->
 
-<!-- One or two sentences: what kind of instrument is it, and what is it like to play? -->
+<!-- Ghost Hunter is a musical halloween-themed hide and seek instrument where the player uses a flashlight (using pointer/trackpad) to search for a hidden ghost. As the pointer gets closer to the ghost, it (the ghost) becomes more visible and a spooky drone grows louder. When the ghost gets found (touched by pointer), it sings a short little melody before teleporting to a new location on the screen, continuing thr hunt. -->
 
 ## How to play
 
-<!-- Fill in the table with a row for everything the player can do with the pointer: clicking, moving slowly or fast, moving in circles, holding still... Say what happens to the sound and to the shapes. If you added keys, give them rows too. -->
-
 | When you...  | The sound...                         | The shapes... |
 | ------------ | ------------------------------------ | ------------- |
-| Click or tap | Plays a C4 (the example: replace it) | Nothing yet   |
-|              |                                      |               |
+| Click or tap | Enables audio playback | Nothing happens visually   |
+| Move the pointer             | Changes the ghost drone's pitch based on the pointer's movement speed.                                     | Moves the flashlight and creates a fading light trail showing recent pointer positions.              |
+| Move pointer quickly             | Raises the pitch of the ghost drone.                                     | Increases the flashlight glow intensity (albeit not all that visble).              |
+| Move pointer closer to or further from the ghost.             | Moving closer makes the ghost drone louder and higher pitched while moving further away makes the drone quiter and darker.                                     | Moving closer gradually reveals the ghost by increasing it's opacity, and moving further away causes the ghost to become more transparent and harder to see.              |
+| Touch the ghost             | Plays a short semi-random melody based on the pentatonic scale.                                     | The ghost glows blue to signal that it has been found, and then teleports to a new random location.              |
 
 <!-- Anything else a player needs to know: how to get started, a good thing to try first. -->
 
