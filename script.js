@@ -103,9 +103,9 @@ ghostGain.connect(reverb);
 ghostDrone.start();
 
 // ---------- Update ----------
-// Update the state. This is called every 100ms.
+// Update the state. This is called every 10ms.
 function update() {
-  setTimeout(update, 10); // call update() again in 100 milliseconds
+  setTimeout(update, 10); // call update() again in 10 milliseconds
   // new stuff below
   ghost.setSize(
     80 + Math.sin(Date.now() * 0.002) * 10
@@ -147,6 +147,7 @@ function use() {
       );
       dot.setSize(10 + index * 10);
       dot.element.style.opacity = (index + 1) / trailLength;
+      dot.element.style.filter = "blur(10px)";
     }
   });
 }
@@ -258,7 +259,7 @@ function setup() {
   for (let i = 0; i < trailLength; i++) {
     const dot = createShape("trail");
     dot.setRoundedness(1);
-    dot.setColour("white");
+    dot.setColour("hsl(69, 86%, 74%)");
     dot.setSize(30);
     trail.push(dot);
   }

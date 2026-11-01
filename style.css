@@ -15,7 +15,7 @@
   background: hsl(0, 0%, 100%);
   width:100px;
   height:150px;
-  -webkit-border-radius: 8px; /* this gets a problem ping, but seems to work nevertheless hence why it's still here. plus, the ghost element becomes and oval without this. */
+  -webkit-border-radius: 8px; /* this pings as a problem, but seems to work nevertheless hence why it's still here. plus, the ghost element becomes and oval without this. */
   -webkit-top-right-border-radius:50%;
   -webkit-top-left-border-radius:50%;
   border-top-right-radius:50%;
@@ -24,6 +24,10 @@
 
 #flashlight {
   background-color: yellow; /* color here is more or less a placeholder to ensure that flashlight exists as an element */
+}
+
+#trail {
+  background-color: yellow;  /* color here is more or less a placeholder to ensure that trail exists as an element */
 }
 
 /* Prevent padding and border from affecting element width. */
