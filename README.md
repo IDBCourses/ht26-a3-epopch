@@ -16,7 +16,10 @@
 | Move pointer closer to or further from the ghost.             | Moving closer makes the ghost drone louder and higher pitched while moving further away makes the drone quiter and darker.                                     | Moving closer gradually reveals the ghost by increasing it's opacity, and moving further away causes the ghost to become more transparent and harder to see.              |
 | Touch the ghost             | Plays a short semi-random melody based on the pentatonic scale.                                     | The ghost glows blue to signal that it has been found, and then teleports to a new random location.              |
 
-<!-- Anything else a player needs to know: how to get started, a good thing to try first. -->
+**Tip:**
+- Click once before playing to enable sound.
+- This is programmed with a trackpad in mind.
+- The changing of the sound and flashlight isn't all that obvious. Try moving rapidly to see and hear the changes better.
 
 ---
 
