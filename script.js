@@ -238,7 +238,7 @@ function setup() {
   flashlight.setPosition(0, 0);
   flashlight.element.style.boxShadow = "0 0 100px 20px hsl(69, 87%, 79%)";
 
-  // uses a FOR LOOP to create trail shapes
+  // uses a for loop to create trail shapes
   for (let i = 0; i < trailLength; i++) { // creates the trail shapes used to visualise recent pointer movement.
     const dot = createShape("trail");
     dot.setRoundedness(1);
