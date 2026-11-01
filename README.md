@@ -3,7 +3,7 @@
 **Play it here:** https://github.com/IDBCourses/ht26-a3-epopch
 
 **Name:** Elsa Lindblom (ap6579)
- Ghost Hunter is a musical halloween-themed hide and seek instrument where the player uses a flashlight (using pointer/trackpad) to search for a hidden ghost. As the pointer gets closer to the ghost, it (the ghost) becomes more visible and a spooky drone grows louder. When the ghost gets found (touched by pointer), it sings a short little melody before teleporting to a new location on the screen, continuing thr hunt.
+Ghost Hunter is a musical halloween-themed hide and seek instrument where the player uses a flashlight (using pointer/trackpad) to search for a hidden ghost. As the pointer gets closer to the ghost, it (the ghost) becomes more visible and a spooky drone grows louder. When the ghost gets found (touched by pointer), it sings a short little melody before teleporting to a new location on the screen, continuing thr hunt.
 
 ## How to play
 
