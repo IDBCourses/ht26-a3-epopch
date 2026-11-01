@@ -30,12 +30,11 @@ import { createShape } from "./shape.js";
 const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // pentathonic scale
 // new stuff below
 // const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
-const noteLength = "8n"; // fairly certain this doesn't actually work
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: where the pointer is, how fast it's moving, or whether a drone is on.
-const shape = createShape("shape"); // test
+//const shape = createShape("shape"); // test
 const ghost = createShape("ghost"); // ghost
 const flashlight = createShape("flashlight"); // flash light
 
@@ -95,7 +94,7 @@ reverb.toDestination();
 // ghost drone below
 const ghostDrone = new Tone.Oscillator({
   frequency: 220,
-  type: "sine"
+  type: "triangle8"
 });
 const ghostGain = new Tone.Gain(0);
 ghostDrone.connect(ghostGain);
@@ -160,7 +159,7 @@ function startSound(event) {
   console.log("Pointer down at", event.clientX, event.clientY);
 }
 
-function pointerEnter(event) {
+/*function pointerEnter(event) {
   synth.triggerAttack("C4");
   shape.setColour(200, 10, 80);
   //synth.volume.value = +12; // use this to change the volume of the sound, can be tied to changing value
@@ -171,7 +170,7 @@ function pointerLeave(event) {
   synth.triggerRelease();
   shape.setColour(120, 80, 50);
   //synth.volume.value = -12;
-}
+} */
 
 function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
   // another test below, splendid it works. makes the jingle different everytime the ghost is touched
@@ -245,10 +244,10 @@ function setup() {
   update(); // start the update loop
   use(); // start the use loop
 
-  shape.setPosition(0.3, 0.3);
+  /*shape.setPosition(0.3, 0.3);
   shape.setColour(120, 80, 50);
   shape.setRoundedness(0.1);
-  shape.setSize(100);
+  shape.setSize(100); */
 
   flashlight.setRoundedness(1);
   flashlight.setSize(50);
@@ -270,8 +269,8 @@ function setup() {
   window.addEventListener("pointerdown", startSound);
   window.addEventListener("pointermove", pointerMove);
 
-  shape.element.addEventListener("pointerenter", pointerEnter);
-  shape.element.addEventListener("pointerleave", pointerLeave);
+  /*shape.element.addEventListener("pointerenter", pointerEnter);
+  shape.element.addEventListener("pointerleave", pointerLeave); */
 
   ghost.element.addEventListener("pointerenter", ghostEnter);
   ghost.element.addEventListener("pointerleave", ghostLeave);

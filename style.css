@@ -1,10 +1,9 @@
 /* No CSS transitions or animations: everything that moves is moved by your code. */
 
-.shape {
+.shape { /* removing this breaks a lot of the code f */
   width: 100px;
   height: 100px;
-  background-color: hsl(230, 25%, 95%);
-  /* Positioned from the top-left of the window; setPosition() moves it from there. */
+  background-color: hsl(50, 53%, 92%);
   position: absolute;
   top: 0;
   left: 0;
