@@ -26,38 +26,32 @@ import { createShape } from "./shape.js";
 // ---------- Settings ----------
 // Settings variables should contain all of the "fixed" parts of your programs
 // For example: which notes you can play, how fast things move, the tempo.
-// const note = "C4"; // the note played when the pointer goes down
-const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // pentathonic scale
-// new stuff below
-// const randomNote = noteS[Math.floor(Math.random() * noteS.length)];
+const noteS = ["C4", "D4", "E4", "G4", "A4", "C5"]; // uses an ARRAY to store the notes used in the ghost melody
+const ghost = createShape("ghost"); // ghost, creates the hidden target players search for
+const flashlight = createShape("flashlight"); // flashlight, visual representation of players' cursor
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
-// For example: where the pointer is, how fast it's moving, or whether a drone is on.
-//const shape = createShape("shape"); // test
-const ghost = createShape("ghost"); // ghost
-const flashlight = createShape("flashlight"); // flash light
-
-// new stuff below
-let pointerX = 0; // stores the pointers position
+// current pointer position, gets updated later in program
+let pointerX = 0;
 let pointerY = 0;
 
+// current position of the ghost, gets updated later in program and the program breaks without it here
 let ghostX = 0.5;
 let ghostY = 0.5;
 
-const trail = [];
-const trailLength = 5;
-const pointerHistory = [];
+const trail = []; // initial array for shapes used to draw the visual tray behind the flashlight/pointer
+const trailLength = 5; // CONSTANT VALUE for maximum number of previous pointer positions stored for the trail
+const pointerHistory = []; // array storing a history of pointer positions so interaction is based on MOVEMENT OVER TIME rather than a single pointer position.
 
-let ghostNoteIndex = 0;
+// previous pointer position used to calculate the movement speed
 let pastX = 0;
 let pastY = 0;
-let pointerSpeed = 0;
+
+let pointerSpeed = 0; // distance travelled between pointer events
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
-//const synth = new Tone.PolySynth(Tone.Synth).toDestination(); // can play several notes at once // I want to change this, but don't want to ruin the code
-//new stuff below, filter and reverb work on synth, i'll have to test ghostSynth
 const synth = new Tone.Synth({
   oscillator: {
     type: "triangle8"
@@ -81,7 +75,7 @@ const filter = new Tone.Filter(
   "lowpass"
 );
 
-const vibrato = new Tone.Vibrato({ // adds a more wobbly feel to the sound
+const vibrato = new Tone.Vibrato({
   frequency: 5,
   depth: 0.35
 });
@@ -91,12 +85,15 @@ vibrato.connect(filter);
 filter.connect(reverb);
 reverb.toDestination();
 
-// ghost drone below
+// continuous drone used as an audio clue for the ghost hunt
+// the drone gets louder and brighter as the pointer gets closer to the ghost
 const ghostDrone = new Tone.Oscillator({
   frequency: 220,
   type: "triangle8"
 });
+
 const ghostGain = new Tone.Gain(0);
+
 ghostDrone.connect(ghostGain);
 ghostGain.connect(reverb);
 ghostDrone.start();
@@ -105,7 +102,7 @@ ghostDrone.start();
 // Update the state. This is called every 10ms.
 function update() {
   setTimeout(update, 10); // call update() again in 10 milliseconds
-  // new stuff below
+  // makes the ghost gently pulse to give it a more floating and animated visual appearance
   ghost.setSize(
     80 + Math.sin(Date.now() * 0.002) * 10
   );
@@ -115,30 +112,36 @@ function update() {
 // Use the state to make sound and move shapes. This is called every 100ms.
 function use() {
   setTimeout(use, 100); // call use() again in 100 milliseconds
-  // new stuff below
   const ghostDX = pointerX - ghostX;
   const ghostDY = pointerY - ghostY;
-  const distance = Math.sqrt(
+  const distance = Math.sqrt( // calculates the distance between the pointer and the ghost
     ghostDX * ghostDX + ghostDY * ghostDY
   );
-  const intensity = Math.max(
+  const intensity = Math.max( // converts distance into an intensity value. highter intensity means that the player is getting closer to the ghost.
     0, 1 - distance * 1.5
   );
-  const glowSize = 20 + pointerSpeed * 300;
 
+  // increases the drone volume as the player approaches the ghost and/or moves rapidly
+  // pointer distance continuously affects drone volume
   ghostGain.gain.rampTo(
     intensity * 0.2,
     0.1
   );
-
+  // pointer distance continuously affects timbre by opening the filter
   filter.frequency.rampTo(
     500 + intensity * 400,
     0.1
   );
 
-  ghost.element.style.opacity = 0.02 + intensity * 0.98;
+  // ghost's visibility changes continuously based on proximity to pointer
+  ghost.element.style.opacity = 0.02 + intensity * 0.98; // gradually reveal the ghost as the player/pointer gets closer
+
+  // increases the flashlight's glow based on movement speed
+  const glowSize = 20 + pointerSpeed * 300;
   flashlight.element.style.boxShadow = `0 0 ${glowSize}px 20px hsl(69, 87%, 79%)`; //idk if this does anything
 
+  // visual trail shows recent pointer movement using stored position history
+  // uses forEach() to update each trail element
   trail.forEach((dot, index) => {
     if (pointerHistory[index]) {
       dot.setPosition(pointerHistory[index].x,
@@ -159,8 +162,8 @@ function startSound(event) {
   console.log("Pointer down at", event.clientX, event.clientY);
 }
 
-function ghostEnter(event) { // when ghost gets touched by the pointer it'll teleport
-  // another test below, splendid it works. makes the jingle different everytime the ghost is touched
+function ghostEnter(event) {
+  // selects a different starting note each time pointer touches the ghost so the melody varies.
   const randomStart = Math.floor(Math.random() * noteS.length);
   noteS.forEach((_, index) => {
     const noteGhost = noteS[(randomStart + index) % noteS.length];
@@ -169,8 +172,9 @@ function ghostEnter(event) { // when ghost gets touched by the pointer it'll tel
     }, index * 50);
   });
 
-  ghost.setColour(0, 1, 50); // fix color later
-  ghost.element.style.boxShadow = "0 0 50px hsl(192, 84%, 71%)"; // adds box shadow when ghost is found
+  // visual effects that highlights the ghost briefly as it is discovered
+  ghost.setColour(0, 1, 50);
+  ghost.element.style.boxShadow = "0 0 50px hsl(192, 84%, 71%)";
 
   setTimeout(() => { // delays the teleportation briefly so that there's enough time for the note to get played!
     teleportGhost();
@@ -178,38 +182,35 @@ function ghostEnter(event) { // when ghost gets touched by the pointer it'll tel
 }
 
 function ghostLeave(event) {
-  console.log("ghost left"); // also here for testing
   synth.volume.value = -12;
-  synth.triggerAttackRelease("G4", "16n");
-  //synth.triggerAttackRelease(randomNote, "12n");
-  ghost.setColour(0, 0, 100);
-  ghost.element.style.boxShadow = ""; // removes box shadow
+  synth.triggerAttackRelease("G4", "16n"); // plays a short cue to indicate that the ghost has teleported
+  ghost.setColour(0, 0, 100); // returns the ghost's color back to normal
+  ghost.element.style.boxShadow = ""; // removes the discovery glow
 }
 
-function pointerMove(event) { // this works but the shape isnt centred on pointer right now
-  const lastX = event.clientX / window.innerWidth;
-  const lastY = event.clientY / window.innerHeight;
-  flashlight.setPosition(lastX, lastY); // add back later, makes shape follow pointer
+// pointerevent data is used to continuously control both sound and visuals.
+function pointerMove(event) {
+  // this function updates pointer position, movement speed, flashlight position and trail history
 
   pointerX = event.clientX / window.innerWidth;
   pointerY = event.clientY / window.innerHeight;
 
-  // new stuff below, unsure if I want to keep this, check again later
-  const moveDX = pointerX - pastX;
-  const moveDY = pointerY - pastY;
+  flashlight.setPosition(pointerX, pointerY); // sets the flashlights position to the pointer, not entirely centred unfortunately but know that I've tried.
 
-  pointerSpeed = Math.sqrt(moveDX * moveDX + moveDY * moveDY);
-
+  // measures the pointer movement since the previous event
   pastX = pointerX;
   pastY = pointerY;
+  const moveDX = pointerX - pastX;
+  const moveDY = pointerY - pastY;
+  // calculates pointer speed using current and previous pointer positions (processing data over time)
+  pointerSpeed = Math.sqrt(moveDX * moveDX + moveDY * moveDY);
 
-  ghostDrone.frequency.rampTo(
+  ghostDrone.frequency.rampTo( // increases the drone pitch when the pointer moves more quickly
     220 + pointerSpeed * 300,
     0.1
   );
 
-  // NEW STUFF
-  pointerHistory.push({
+  pointerHistory.push({ // stores recent pointer positions for the trail effect
     x: pointerX,
     y: pointerY
   });
@@ -218,7 +219,7 @@ function pointerMove(event) { // this works but the shape isnt centred on pointe
   }
 }
 
-function teleportGhost() {
+function teleportGhost() { // moves the ghost to a new random position on the screen
   ghostX = Math.random() * 0.8 + 0.1;
   ghostY = Math.random() * 0.8 + 0.1;
 
@@ -231,13 +232,14 @@ function setup() {
   update(); // start the update loop
   use(); // start the use loop
 
-  flashlight.setRoundedness(1);
+  flashlight.setRoundedness(1); // configures the flashlight's appearance
   flashlight.setSize(50);
   flashlight.setColour(70, 90, 80);
   flashlight.setPosition(0, 0);
   flashlight.element.style.boxShadow = "0 0 100px 20px hsl(69, 87%, 79%)";
 
-  for (let i = 0; i < trailLength; i++) {
+  // uses a FOR LOOP to create trail shapes
+  for (let i = 0; i < trailLength; i++) { // creates the trail shapes used to visualise recent pointer movement.
     const dot = createShape("trail");
     dot.setRoundedness(1);
     dot.setColour("hsl(69, 86%, 74%)");
@@ -247,7 +249,7 @@ function setup() {
 
   teleportGhost(); // spawns the ghost in a random location when setup is called at the start of the program
 
-  // Event listeners below
+  // POINTER EVENTS provide the main form of interaction (eventListeners)
   window.addEventListener("pointerdown", startSound);
   window.addEventListener("pointermove", pointerMove);
 
